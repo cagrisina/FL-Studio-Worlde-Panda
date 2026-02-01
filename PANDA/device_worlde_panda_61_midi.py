@@ -1,10 +1,9 @@
 # name=Worlde Panda 61
 
 import transport
+import channels
 
 def OnControlChange(event):
-    # Play: 119, Stop: 118, Record: 117, Loop: 114, Forward: 116, Rewind: 115
-    
     if event.controlNum == 119:
         transport.start()
         event.handled = True
@@ -25,3 +24,15 @@ def OnControlChange(event):
         event.handled = True
     else:
         event.handled = False
+
+def OnPitchBend(event):
+    event.handled = True
+    selected_channel = channels.selectedChannel()
+    if selected_channel == -1:
+        return
+    pitch_value = event.data1 | (event.data2 << 7)
+    normalised_pitch = (pitch_value - 8192) / 8192.0
+    channels.setChannelPitch(selected_channel, normalised_pitch)
+
+def OnMidiMsg(event):
+    event.handled = False
